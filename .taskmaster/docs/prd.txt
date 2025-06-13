@@ -1,0 +1,61 @@
+# InventOnBot - Discord Q&A Bot for Programming Support
+
+## Project Overview
+A Python-based Discord bot that provides a private Q&A system for programming support, enabling users to submit technical questions while maintaining privacy and organized assistance.
+
+## Core Features
+
+### 1. Question Submission System
+- Users submit questions using `/질문` slash command
+- Questions are only visible to the user who asked and administrators
+- Private thread creation for each question to maintain isolation
+
+### 2. Structured Question Format
+Required fields:
+- OS (Operating System)
+- Programming Language
+- Error Message
+- Purpose/Goal of the code
+
+Optional fields:
+- Code snippet
+- Log files
+- Screenshots
+- Previously attempted solutions
+
+### 3. Privacy & Access Control
+- Questions are private between questioner and admin
+- Other users cannot see questions from different users
+- Admin can see all questions and respond
+- Secure permission handling
+
+### 4. Additional Programming Support Features
+- Code formatting and syntax highlighting
+- Error log analysis
+- Solution tracking and follow-up
+- FAQ system for common issues
+- Resource recommendation system
+- Code review functionality
+- Debug session scheduling
+
+## Technical Requirements
+- Python 3.8+
+- Discord.py library
+- Slash command implementation
+- Database for question storage (SQLite/PostgreSQL)
+- Image upload support for screenshots
+- Thread management system
+- Role-based permission system
+
+## User Experience Goals
+- Simple and intuitive question submission
+- Fast response from administrators
+- Clear organization of conversations
+- Easy follow-up and solution tracking
+- Professional development environment support
+
+## Success Metrics
+- Question response time
+- User satisfaction with support quality
+- System uptime and reliability
+- Number of resolved issues
