@@ -130,6 +130,23 @@ class AdminCommands(commands.Cog):
                 is_solution=is_solution
             )
             
+            # Update daily statistics
+            await db_manager.update_daily_stats('answers_given')
+            if is_solution:
+                await db_manager.update_daily_stats('questions_solved')
+                
+                # Calculate and record response time
+                question = await db_manager.get_question(question_id)
+                if question and question['created_at']:
+                    from datetime import datetime
+                    try:
+                        created_time = datetime.fromisoformat(question['created_at'].replace('Z', '+00:00'))
+                        response_time = datetime.now() - created_time
+                        minutes = int(response_time.total_seconds() / 60)
+                        await db_manager.record_response_time(question_id, minutes)
+                    except Exception:
+                        pass  # 시간 계산 실패시 무시
+            
             # Post answer in thread
             thread = interaction.guild.get_channel_or_thread(question['thread_id'])
             if thread:
@@ -153,7 +170,15 @@ class AdminCommands(commands.Cog):
                     # Automatically change status to solved
                     await db_manager.update_question_status(question_id, 'solved')
                 
-                await thread.send(embed=embed)
+                answer_message = await thread.send(embed=embed)
+                
+                # Add image upload option for admin
+                image_option_embed = discord.Embed(
+                    title="📷 이미지 첨부 옵션",
+                    description="설명에 도움이 될 이미지가 있다면 이 메시지에 답장하여 업로드해주세요.",
+                    color=discord.Color.blue()
+                )
+                await thread.send(embed=image_option_embed)
                 
                 # Notify the question author
                 question_author = interaction.guild.get_member(question['user_id'])
@@ -266,6 +291,96 @@ class AdminCommands(commands.Cog):
             self.bot.logger.error(f"Error searching questions: {e}")
             await interaction.response.send_message(
                 "❌ 검색 중 오류가 발생했습니다.",
+                ephemeral=True
+            )
+    
+    @app_commands.command(name="이미지답변", description="이미지와 함께 답변을 등록합니다 (관리자 전용)")
+    @app_commands.describe(
+        question_id="질문 ID",
+        answer="답변 내용",
+        is_solution="이 답변이 최종 해결책인지 여부"
+    )
+    async def add_answer_with_image(
+        self,
+        interaction: discord.Interaction,
+        question_id: int,
+        answer: str,
+        is_solution: bool = False
+    ):
+        """Add an answer with image option (Admin only)"""
+        if not self.is_admin(interaction.user):
+            await interaction.response.send_message(
+                "❌ 이 명령어는 관리자만 사용할 수 있습니다.",
+                ephemeral=True
+            )
+            return
+        
+        try:
+            db_manager = self.bot.db_manager
+            question = await db_manager.get_question(question_id)
+            
+            if not question:
+                await interaction.response.send_message(
+                    f"❌ 질문 ID {question_id}를 찾을 수 없습니다.",
+                    ephemeral=True
+                )
+                return
+            
+            # Add answer to database
+            answer_id = await db_manager.add_answer(
+                question_id=question_id,
+                admin_id=interaction.user.id,
+                answer_text=answer,
+                is_solution=is_solution
+            )
+            
+            # Post answer in thread
+            thread = interaction.guild.get_channel_or_thread(question['thread_id'])
+            if thread:
+                embed = discord.Embed(
+                    title="관리자 답변" if not is_solution else "✅ 해결책",
+                    description=answer,
+                    color=discord.Color.green() if is_solution else discord.Color.blue(),
+                    timestamp=discord.utils.utcnow()
+                )
+                embed.set_footer(
+                    text=f"답변자: {interaction.user.display_name}",
+                    icon_url=interaction.user.avatar.url if interaction.user.avatar else None
+                )
+                
+                if is_solution:
+                    embed.add_field(
+                        name="🎉 해결됨",
+                        value="이 답변으로 문제가 해결되었습니다!",
+                        inline=False
+                    )
+                    # Automatically change status to solved
+                    await db_manager.update_question_status(question_id, 'solved')
+                
+                await thread.send(embed=embed)
+                
+                # Send image upload instructions
+                image_instructions = discord.Embed(
+                    title="📎 이미지 업로드 안내",
+                    description="답변과 함께 제공할 이미지를 지금 업로드해주세요.",
+                    color=discord.Color.orange()
+                )
+                image_instructions.add_field(
+                    name="업로드 방법",
+                    value="1. 이 스레드에 직접 이미지 파일을 드래그&드롭하거나\n2. 파일 첨부 버튼을 사용하여 업로드\n3. 이미지 설명을 함께 작성해주세요",
+                    inline=False
+                )
+                await thread.send(embed=image_instructions)
+            
+            await interaction.response.send_message(
+                f"✅ 질문 #{question_id}에 답변을 등록했습니다. 이제 스레드에 이미지를 업로드해주세요. (답변 ID: {answer_id})",
+                ephemeral=True
+            )
+            
+        except Exception as e:
+            self.bot.logger.error(f"Error adding answer with image: {e}")
+            await interaction.response.send_message(
+                "❌ 답변 등록 중 오류가 발생했습니다.",
                 ephemeral=True
             )
     

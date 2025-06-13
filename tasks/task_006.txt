@@ -1,0 +1,13 @@
+# Task ID: 6
+# Title: 프라이빗 스레드 생성 시스템
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: 질문별 프라이빗 스레드 자동 생성
+# Details:
+- 질문 제출 시 자동 스레드 생성
+- 질문자와 관리자만 접근 가능
+- 스레드 제목에 질문 요약 포함
+
+# Test Strategy:
+스레드 생성 및 권한 확인

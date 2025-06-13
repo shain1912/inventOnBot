@@ -1,0 +1,13 @@
+# Task ID: 3
+# Title: Discord 봇 기본 설정 및 연결
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Discord 봇 토큰 설정, 기본 봇 클래스 구현
+# Details:
+- Discord 애플리케이션 생성
+- 봇 토큰 환경변수 설정
+- 기본 봇 클래스 및 이벤트 핸들러 구현
+
+# Test Strategy:
+봇 온라인 상태 확인

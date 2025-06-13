@@ -12,6 +12,9 @@ class Config:
     BOT_PREFIX = os.getenv('BOT_PREFIX', '!')
     ADMIN_ROLE_ID = int(os.getenv('ADMIN_ROLE_ID', 0))
     
+    # Bot Permissions
+    BOT_PERMISSIONS = 8  # 봇에게 필요한 모든 권한
+    
     # Database Configuration
     DATABASE_PATH = os.getenv('DATABASE_PATH', 'database/bot.db')
     

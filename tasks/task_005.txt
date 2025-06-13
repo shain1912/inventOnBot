@@ -1,0 +1,14 @@
+# Task ID: 5
+# Title: 질문 폼 모달 UI 구현
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: 구조화된 질문 입력을 위한 모달 폼 구현
+# Details:
+- OS, 프로그래밍 언어 (필수)
+- 에러 메시지, 목적 (필수)
+- 코드, 로그, 스크린샷, 시도한 조치 (선택)
+- 입력 검증 및 에러 처리
+
+# Test Strategy:
+모달 폼 입력 및 검증 테스트

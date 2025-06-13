@@ -1,0 +1,13 @@
+# Task ID: 9
+# Title: 코드 포맷팅 및 문법 하이라이팅
+# Status: pending
+# Dependencies: None
+# Priority: low
+# Description: 코드 블록 자동 포맷팅 기능
+# Details:
+- 언어별 문법 하이라이팅
+- 코드 블록 자동 정리
+- 긴 코드 파일 첨부 지원
+
+# Test Strategy:
+다양한 언어 코드 포맷팅 테스트

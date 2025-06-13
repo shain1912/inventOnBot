@@ -42,6 +42,10 @@ class InventOnBot(commands.Bot):
             # Load cogs/extensions
             await self.load_extension('bot.cogs.question_handler')
             await self.load_extension('bot.cogs.admin_commands')
+            await self.load_extension('bot.cogs.image_handler')
+            await self.load_extension('bot.cogs.faq_system')
+            await self.load_extension('bot.cogs.welcome_system')
+            #await self.load_extension('bot.cogs.statistics_system')
             
             self.logger.info("Bot setup completed successfully")
             

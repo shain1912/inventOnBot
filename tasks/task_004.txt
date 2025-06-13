@@ -1,0 +1,13 @@
+# Task ID: 4
+# Title: 슬래시 커맨드 (/질문) 구현
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: 질문 제출을 위한 슬래시 커맨드 구현
+# Details:
+- /질문 슬래시 커맨드 등록
+- 모달 폼으로 질문 입력 받기
+- 필수/선택 필드 검증
+
+# Test Strategy:
+커맨드 실행 및 모달 표시 확인

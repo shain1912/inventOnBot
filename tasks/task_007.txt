@@ -1,0 +1,13 @@
+# Task ID: 7
+# Title: 권한 및 접근 제어 시스템
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: 사용자별 질문 접근 권한 관리
+# Details:
+- 관리자 역할 확인
+- 질문자 본인 확인
+- 타인 질문 접근 차단
+
+# Test Strategy:
+다양한 사용자로 접근 권한 테스트

@@ -1,0 +1,13 @@
+# Task ID: 2
+# Title: 데이터베이스 스키마 설계 및 구현
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: 질문, 사용자, 답변을 저장할 데이터베이스 스키마 설계
+# Details:
+- SQLite 데이터베이스 설계
+- 테이블: questions, users, answers, threads
+- ORM 또는 직접 SQL 구현
+
+# Test Strategy:
+데이터베이스 연결 및 CRUD 테스트

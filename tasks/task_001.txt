@@ -1,0 +1,39 @@
+# Task ID: 1
+# Title: 프로젝트 환경 설정 및 초기 구조 생성
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Python 환경 설정, Discord.py 설치, 프로젝트 폴더 구조 생성
+# Details:
+- Python 가상환경 생성
+- discord.py, python-dotenv 등 필수 라이브러리 설치
+- 기본 폴더 구조 생성 (bot/, utils/, database/, config/)
+
+# Test Strategy:
+설치된 패키지 확인 및 폴더 구조 검증
+
+# Subtasks:
+## 1.1. Python 가상환경 생성 [pending]
+### Dependencies: None
+### Description: 프로젝트용 Python 가상환경 설정
+### Details:
+venv 또는 conda를 사용하여 독립적인 Python 환경 생성
+
+## 1.2. 필수 라이브러리 설치 [pending]
+### Dependencies: None
+### Description: Discord.py 및 관련 라이브러리 설치
+### Details:
+discord.py, python-dotenv, aiofiles, aiosqlite 설치
+
+## 1.3. 프로젝트 폴더 구조 생성 [pending]
+### Dependencies: None
+### Description: 기본 디렉토리 구조 생성
+### Details:
+bot/, utils/, database/, config/, logs/ 폴더 생성
+
+## 1.4. 환경 설정 파일 생성 [pending]
+### Dependencies: None
+### Description: .env 및 config.py 파일 생성
+### Details:
+환경변수 템플릿 및 설정 파일 구조 생성
+

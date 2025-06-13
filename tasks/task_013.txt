@@ -1,0 +1,11 @@
+# Task ID: 13
+# Title: 이미지 첨부 기능 구현
+# Status: done
+# Dependencies: None
+# Priority: medium
+# Description: 질문자와 관리자가 이미지를 첨부할 수 있는 기능 추가
+# Details:
+- 질문 모달에 이미지 첨부 안내 추가\n- 스레드 내 이미지 업로드 지원\n- 관리자 답변 시 이미지 첨부 기능\n- 이미지 첨부 시 자동 설명 요청
+
+# Test Strategy:
+

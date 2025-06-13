@@ -104,6 +104,9 @@ class QuestionModal(discord.ui.Modal, title='프로그래밍 질문하기'):
                 code_snippet=self.code_snippet.value if self.code_snippet.value else None
             )
             
+            # Update daily statistics
+            await db_manager.update_daily_stats('questions_created')
+            
             # Create detailed question embed
             embed = discord.Embed(
                 title="새로운 프로그래밍 질문",
@@ -135,7 +138,20 @@ class QuestionModal(discord.ui.Modal, title='프로그래밍 질문하기'):
             embed.set_footer(text=f"질문자: {user.display_name}", icon_url=user.avatar.url if user.avatar else None)
             
             # Send question to the thread
-            await thread.send(embed=embed)
+            message = await thread.send(embed=embed)
+            
+            # Add image upload reminder
+            image_reminder = discord.Embed(
+                title="📷 이미지 첨부 안내",
+                description="스크린샷이나 에러 화면 이미지가 있다면 이 메시지에 답장하여 직접 업로드해주세요.",
+                color=discord.Color.orange()
+            )
+            image_reminder.add_field(
+                name="이미지 첨부 방법",
+                value="1. 이 메시지에 답장하기\n2. 파일 선택 또는 드래그&드롭\n3. 이미지에 대한 설명 메시지 추가",
+                inline=False
+            )
+            await thread.send(embed=image_reminder)
             
             # Create follow-up modal view for optional fields
             follow_up_view = OptionalFieldsView(question_id, db_manager)
@@ -145,7 +161,8 @@ class QuestionModal(discord.ui.Modal, title='프로그래밍 질문하기'):
                 f"✅ 질문이 성공적으로 등록되었습니다!\n"
                 f"스레드: {thread.mention}\n"
                 f"질문 ID: `{question_id}`\n\n"
-                f"추가 정보(로그, 스크린샷, 시도한 조치)가 있다면 아래 버튼을 눌러 추가할 수 있습니다.",
+                f"📷 **이미지 첨부**: 스크린샷이나 에러 화면이 있다면 스레드에 직접 업로드해주세요!\n"
+                f"📝 **추가 정보**: 아래 버튼을 눌러 로그, 시도한 조치 등을 추가할 수 있습니다.",
                 view=follow_up_view,
                 ephemeral=True
             )

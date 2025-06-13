@@ -1,0 +1,13 @@
+# Task ID: 11
+# Title: 로그 및 통계 시스템
+# Status: pending
+# Dependencies: None
+# Priority: low
+# Description: 질문 통계 및 로그 관리
+# Details:
+- 질문 수, 응답 시간 통계
+- 에러 로그 수집
+- 대시보드 구현
+
+# Test Strategy:
+통계 정확성 및 로그 수집 확인
