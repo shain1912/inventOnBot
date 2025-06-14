@@ -16,7 +16,12 @@ class Config:
     BOT_PERMISSIONS = 8  # 봇에게 필요한 모든 권한
     
     # Database Configuration
-    DATABASE_PATH = os.getenv('DATABASE_PATH', 'database/bot.db')
+    DATABASE_TYPE = os.getenv('DATABASE_TYPE', 'sqlite')  # 'sqlite' or 'supabase'
+    DATABASE_PATH = os.getenv('DATABASE_PATH', 'database/bot.db')  # SQLite용
+    
+    # Supabase Configuration
+    SUPABASE_URL = os.getenv('SUPABASE_URL')  # Supabase Project URL
+    SUPABASE_ANON_KEY = os.getenv('SUPABASE_ANON_KEY')  # Supabase Anon Key
     
     # Logging Configuration
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
@@ -33,4 +38,12 @@ class Config:
             raise ValueError("DISCORD_TOKEN is required")
         if not cls.ADMIN_ROLE_ID:
             raise ValueError("ADMIN_ROLE_ID is required")
+        
+        # Validate database configuration
+        if cls.DATABASE_TYPE == 'supabase':
+            if not cls.SUPABASE_URL:
+                raise ValueError("SUPABASE_URL is required when using Supabase")
+            if not cls.SUPABASE_ANON_KEY:
+                raise ValueError("SUPABASE_ANON_KEY is required when using Supabase")
+        
         return True

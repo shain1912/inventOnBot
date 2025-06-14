@@ -35,8 +35,16 @@ class InventOnBot(commands.Bot):
     async def setup_hook(self):
         """Setup hook called when bot is starting"""
         try:
-            # Initialize database
-            self.db_manager = DatabaseManager()
+            # Initialize database based on configuration
+            from config.config import Config
+            
+            if Config.DATABASE_TYPE == 'supabase':
+                from database.supabase_manager import SupabaseManager
+                self.db_manager = SupabaseManager()
+            else:
+                from database.database_manager import DatabaseManager
+                self.db_manager = DatabaseManager()
+                
             await self.db_manager.initialize()
             
             # Load cogs/extensions
@@ -47,7 +55,7 @@ class InventOnBot(commands.Bot):
             await self.load_extension('bot.cogs.welcome_system')
             #await self.load_extension('bot.cogs.statistics_system')
             
-            self.logger.info("Bot setup completed successfully")
+            self.logger.info(f"Bot setup completed successfully with {Config.DATABASE_TYPE} database")
             
         except Exception as e:
             self.logger.error(f"Error during bot setup: {e}")

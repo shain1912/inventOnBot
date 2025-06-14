@@ -56,6 +56,65 @@
 - 통계 및 로그 관리 (구현 예정)
 - 자동 알림 시스템
 
+## 클라우드 배포 및 Supabase 마이그레이션
+
+### 🌐 클라우드 배포 문제 해결
+
+클라우드타입 등의 클라우드 플랫폼에서는 파일 시스템이 ephemeral하기 때문에 SQLite 데이터베이스가 재배포할 때마다 초기화됩니다. 이 문제를 해결하기 위해 Supabase PostgreSQL로 마이그레이션할 수 있습니다.
+
+### 📊 Supabase 설정
+
+1. **Supabase 프로젝트 생성**
+   - [Supabase](https://supabase.com)에서 새 프로젝트 생성
+   - 데이터베이스 비밀번호 설정
+   - 프로젝트 설정 > API에서 Project URL과 anon public key 확인
+
+2. **환경변수 설정**
+   ```env
+   # Database Configuration
+   DATABASE_TYPE=supabase
+   SUPABASE_URL=https://your-project-id.supabase.co
+   SUPABASE_ANON_KEY=your-anon-public-key-here
+   ```
+
+### 🔄 데이터베이스 마이그레이션
+
+**기존 SQLite 데이터를 Supabase로 마이그레이션:**
+
+1. **마이그레이션 스크립트 실행**
+   ```bash
+   python utils/migrate_to_supabase.py
+   ```
+
+2. **마이그레이션 과정**
+   - 사용자 데이터 마이그레이션
+   - 질문 데이터 마이그레이션  
+   - FAQ 데이터 마이그레이션
+   - 통계 데이터 마이그레이션
+   - 자동 검증 및 결과 리포트
+
+3. **마이그레이션 후 설정**
+   ```env
+   # .env 파일 업데이트
+   DATABASE_TYPE=supabase
+   ```
+
+### 📁 데이터베이스 호환성
+
+봇은 다음 두 가지 데이터베이스를 모두 지원합니다:
+
+- **SQLite** (`DATABASE_TYPE=sqlite`): 로컬 개발용
+- **Supabase PostgreSQL** (`DATABASE_TYPE=supabase`): 클라우드 배포용
+
+동일한 코드베이스로 두 환경을 모두 지원하며, 환경변수만 변경하면 됩니다.
+
+### 🚀 클라우드 배포 권장사항
+
+1. **로컬 개발**: SQLite 사용
+2. **프로덕션/클라우드**: Supabase 사용
+3. **데이터 백업**: 정기적인 데이터베이스 백업
+4. **환경 분리**: 개발/운영 환경 분리
+
 ## 설치 및 설정
 
 ### 1. 환경 설정
