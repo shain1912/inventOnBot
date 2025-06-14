@@ -52,6 +52,9 @@ class QuestionModal(discord.ui.Modal, title='프로그래밍 질문하기'):
     async def on_submit(self, interaction: discord.Interaction):
         """Handle form submission"""
         try:
+            # 즉시 응답하여 3초 제한 해결
+            await interaction.response.defer(ephemeral=True)
+            
             # Get the bot and database manager
             bot = interaction.client
             db_manager = bot.db_manager
@@ -80,7 +83,7 @@ class QuestionModal(discord.ui.Modal, title='프로그래밍 질문하기'):
             
             # Ensure parent_channel is a text channel that supports threads
             if not hasattr(parent_channel, 'create_thread'):
-                await interaction.response.send_message(
+                await interaction.followup.send(
                     "❌ 이 채널에서는 스레드를 생성할 수 없습니다. 텍스트 채널에서 다시 시도해주세요.",
                     ephemeral=True
                 )
@@ -171,8 +174,8 @@ class QuestionModal(discord.ui.Modal, title='프로그래밍 질문하기'):
             # Create follow-up modal view for optional fields
             follow_up_view = OptionalFieldsView(question_id, db_manager)
             
-            # Respond to user
-            await interaction.response.send_message(
+            # followup으로 응답 전송
+            await interaction.followup.send(
                 f"✅ 질문이 성공적으로 등록되었습니다!\n"
                 f"스레드: {thread.mention}\n"
                 f"질문 ID: `{question_id}`\n\n"
@@ -184,10 +187,19 @@ class QuestionModal(discord.ui.Modal, title='프로그래밍 질문하기'):
             
         except Exception as e:
             bot.logger.error(f"Error submitting question: {e}")
-            await interaction.response.send_message(
-                "❌ 질문 등록 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
-                ephemeral=True
-            )
+            try:
+                if not interaction.response.is_done():
+                    await interaction.response.send_message(
+                        "❌ 질문 등록 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+                        ephemeral=True
+                    )
+                else:
+                    await interaction.followup.send(
+                        "❌ 질문 등록 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+                        ephemeral=True
+                    )
+            except:
+                pass  # 이미 응답이 전송된 경우
     
     def _detect_language(self, prog_lang: str) -> str:
         """Detect language for code syntax highlighting"""
@@ -261,6 +273,9 @@ class OptionalInfoModal(discord.ui.Modal, title='추가 정보 입력'):
     async def on_submit(self, interaction: discord.Interaction):
         """Handle optional info submission"""
         try:
+            # 즉시 응답하여 3초 제한 해결
+            await interaction.response.defer(ephemeral=True)
+            
             # Get question and post additional info to thread
             question = await self.db_manager.get_question(self.question_id)
             if question:
@@ -295,16 +310,25 @@ class OptionalInfoModal(discord.ui.Modal, title='추가 정보 입력'):
                     
                     await channel.send(embed=embed)
             
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 "✅ 추가 정보가 질문 스레드에 추가되었습니다!",
                 ephemeral=True
             )
             
         except Exception as e:
-            await interaction.response.send_message(
-                "❌ 추가 정보 등록 중 오류가 발생했습니다.",
-                ephemeral=True
-            )
+            try:
+                if not interaction.response.is_done():
+                    await interaction.response.send_message(
+                        "❌ 추가 정보 등록 중 오류가 발생했습니다.",
+                        ephemeral=True
+                    )
+                else:
+                    await interaction.followup.send(
+                        "❌ 추가 정보 등록 중 오류가 발생했습니다.",
+                        ephemeral=True
+                    )
+            except:
+                pass
 
 class QuestionHandler(commands.Cog):
     """Cog for handling question submissions"""

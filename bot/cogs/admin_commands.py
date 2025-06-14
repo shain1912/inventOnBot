@@ -190,11 +190,14 @@ class AdminCommands(commands.Cog):
             return
         
         try:
+            # 즉시 응답하여 3초 제한 해결
+            await interaction.response.defer(ephemeral=True)
+            
             db_manager = self.bot.db_manager
             question = await db_manager.get_question(question_id)
             
             if not question:
-                await interaction.response.send_message(
+                await interaction.followup.send(
                     f"❌ 질문 ID {question_id}를 찾을 수 없습니다.",
                     ephemeral=True
                 )
@@ -278,17 +281,26 @@ class AdminCommands(commands.Cog):
                     except discord.HTTPException:
                         pass  # User might have DMs disabled
             
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 f"✅ 질문 #{question_id}에 답변을 등록했습니다. (답변 ID: {answer_id})",
                 ephemeral=True
             )
             
         except Exception as e:
             self.bot.logger.error(f"Error adding answer: {e}")
-            await interaction.response.send_message(
-                "❌ 답변 등록 중 오류가 발생했습니다.",
-                ephemeral=True
-            )
+            try:
+                if not interaction.response.is_done():
+                    await interaction.response.send_message(
+                        "❌ 답변 등록 중 오류가 발생했습니다.",
+                        ephemeral=True
+                    )
+                else:
+                    await interaction.followup.send(
+                        "❌ 답변 등록 중 오류가 발생했습니다.",
+                        ephemeral=True
+                    )
+            except:
+                pass
     
     @app_commands.command(name="질문목록", description="모든 질문 목록을 확인합니다 (관리자 전용)")
     @app_commands.describe(
@@ -385,11 +397,14 @@ class AdminCommands(commands.Cog):
             return
         
         try:
+            # 즉시 응답하여 3초 제한 해결
+            await interaction.response.defer(ephemeral=True)
+            
             db_manager = self.bot.db_manager
             question = await db_manager.get_question(question_id)
             
             if not question:
-                await interaction.response.send_message(
+                await interaction.followup.send(
                     f"❌ 질문 ID {question_id}를 찾을 수 없습니다.",
                     ephemeral=True
                 )
@@ -441,17 +456,26 @@ class AdminCommands(commands.Cog):
                 )
                 await thread.send(embed=image_instructions)
             
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 f"✅ 질문 #{question_id}에 답변을 등록했습니다. 이제 스레드에 이미지를 업로드해주세요. (답변 ID: {answer_id})",
                 ephemeral=True
             )
             
         except Exception as e:
             self.bot.logger.error(f"Error adding answer with image: {e}")
-            await interaction.response.send_message(
-                "❌ 답변 등록 중 오류가 발생했습니다.",
-                ephemeral=True
-            )
+            try:
+                if not interaction.response.is_done():
+                    await interaction.response.send_message(
+                        "❌ 답변 등록 중 오류가 발생했습니다.",
+                        ephemeral=True
+                    )
+                else:
+                    await interaction.followup.send(
+                        "❌ 답변 등록 중 오류가 발생했습니다.",
+                        ephemeral=True
+                    )
+            except:
+                pass
     
     @app_commands.command(name="통계", description="질문 및 답변 통계를 확인합니다 (관리자 전용)")
     async def show_stats(self, interaction: discord.Interaction):
