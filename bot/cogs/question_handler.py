@@ -71,7 +71,22 @@ class QuestionModal(discord.ui.Modal, title='프로그래밍 질문하기'):
             
             # Create private thread
             channel = interaction.channel
-            thread = await channel.create_thread(
+            
+            # Check if we're already in a thread, if so get the parent channel
+            if isinstance(channel, discord.Thread):
+                parent_channel = channel.parent
+            else:
+                parent_channel = channel
+            
+            # Ensure parent_channel is a text channel that supports threads
+            if not hasattr(parent_channel, 'create_thread'):
+                await interaction.response.send_message(
+                    "❌ 이 채널에서는 스레드를 생성할 수 없습니다. 텍스트 채널에서 다시 시도해주세요.",
+                    ephemeral=True
+                )
+                return
+            
+            thread = await parent_channel.create_thread(
                 name=title,
                 type=discord.ChannelType.private_thread,
                 reason=f"질문 스레드 - {user.display_name}"

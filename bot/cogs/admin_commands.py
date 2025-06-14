@@ -13,8 +13,92 @@ class AdminCommands(commands.Cog):
     def is_admin(self, user: discord.Member) -> bool:
         """Check if user is admin"""
         from config.config import Config
+        
+        # Check if user has the admin role
         admin_role = user.guild.get_role(Config.ADMIN_ROLE_ID)
-        return admin_role in user.roles if admin_role else False
+        has_admin_role = admin_role in user.roles if admin_role else False
+        
+        # Check if user has administrator permission
+        has_admin_perm = user.guild_permissions.administrator
+        
+        # Check if user is server owner
+        is_owner = user.id == user.guild.owner_id
+        
+        return has_admin_role or has_admin_perm or is_owner
+    
+    async def send_no_permission_message(self, interaction: discord.Interaction):
+        """Send a detailed no permission message"""
+        from config.config import Config
+        admin_role = interaction.guild.get_role(Config.ADMIN_ROLE_ID)
+        embed = discord.Embed(
+            title="❌ 권한 부족",
+            description="이 명령어는 관리자만 사용할 수 있습니다.",
+            color=discord.Color.red()
+        )
+        embed.add_field(
+            name="필요한 권한 (다음 중 하나)",
+            value=f"• 관리자 역할: {admin_role.mention if admin_role else f'<@&{Config.ADMIN_ROLE_ID}> (역할 없음)'}\n• 서버 관리자 권한\n• 서버 소유자",
+            inline=False
+        )
+        embed.add_field(
+            name="💡 도움말",
+            value="권한 확인이 필요하면 `/권한확인` 명령어를 사용해보세요.",
+            inline=False
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+    
+    @app_commands.command(name="권한확인", description="현재 사용자의 관리자 권한을 확인합니다")
+    async def check_permissions(self, interaction: discord.Interaction):
+        """Check user's admin permissions"""
+        from config.config import Config
+        
+        user = interaction.user
+        embed = discord.Embed(
+            title="권한 확인 결과",
+            color=discord.Color.blue(),
+            timestamp=discord.utils.utcnow()
+        )
+        
+        # Check various permission types
+        admin_role = user.guild.get_role(Config.ADMIN_ROLE_ID)
+        has_admin_role = admin_role in user.roles if admin_role else False
+        has_admin_perm = user.guild_permissions.administrator
+        is_owner = user.id == user.guild.owner_id
+        is_admin_overall = self.is_admin(user)
+        
+        embed.add_field(
+            name="🎭 역할 정보",
+            value=f"관리자 역할 ID: `{Config.ADMIN_ROLE_ID}`\n"
+                  f"관리자 역할 존재: {'✅' if admin_role else '❌'}\n"
+                  f"관리자 역할 보유: {'✅' if has_admin_role else '❌'}",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="🔐 권한 정보",
+            value=f"관리자 권한: {'✅' if has_admin_perm else '❌'}\n"
+                  f"서버 소유자: {'✅' if is_owner else '❌'}\n"
+                  f"**최종 관리자 판정: {'✅' if is_admin_overall else '❌'}**",
+            inline=False
+        )
+        
+        if admin_role:
+            embed.add_field(
+                name="📋 관리자 역할 멤버",
+                value=f"총 {len(admin_role.members)}명: {', '.join([m.display_name for m in admin_role.members[:5]])}{'...' if len(admin_role.members) > 5 else ''}",
+                inline=False
+            )
+        
+        user_roles = [role.name for role in user.roles if role.name != '@everyone']
+        embed.add_field(
+            name="👤 내 역할 목록",
+            value=", ".join(user_roles) if user_roles else "역할 없음",
+            inline=False
+        )
+        
+        embed.set_footer(text=f"사용자: {user.display_name}", icon_url=user.avatar.url if user.avatar else None)
+        
+        await interaction.response.send_message(embed=embed, ephemeral=True)
     
     @app_commands.command(name="질문상태", description="질문의 상태를 변경합니다 (관리자 전용)")
     @app_commands.describe(
@@ -29,10 +113,7 @@ class AdminCommands(commands.Cog):
     ):
         """Change question status (Admin only)"""
         if not self.is_admin(interaction.user):
-            await interaction.response.send_message(
-                "❌ 이 명령어는 관리자만 사용할 수 있습니다.",
-                ephemeral=True
-            )
+            await self.send_no_permission_message(interaction)
             return
         
         valid_statuses = ['open', 'in_progress', 'solved', 'closed']
@@ -105,10 +186,7 @@ class AdminCommands(commands.Cog):
     ):
         """Add an answer to a question (Admin only)"""
         if not self.is_admin(interaction.user):
-            await interaction.response.send_message(
-                "❌ 이 명령어는 관리자만 사용할 수 있습니다.",
-                ephemeral=True
-            )
+            await self.send_no_permission_message(interaction)
             return
         
         try:
@@ -225,10 +303,7 @@ class AdminCommands(commands.Cog):
     ):
         """List all questions (Admin only)"""
         if not self.is_admin(interaction.user):
-            await interaction.response.send_message(
-                "❌ 이 명령어는 관리자만 사용할 수 있습니다.",
-                ephemeral=True
-            )
+            await self.send_no_permission_message(interaction)
             return
         
         if limit > 50:
@@ -264,10 +339,7 @@ class AdminCommands(commands.Cog):
     ):
         """Search questions (Admin only)"""
         if not self.is_admin(interaction.user):
-            await interaction.response.send_message(
-                "❌ 이 명령어는 관리자만 사용할 수 있습니다.",
-                ephemeral=True
-            )
+            await self.send_no_permission_message(interaction)
             return
         
         valid_search_types = ['title', 'error', 'code', 'all']
@@ -309,10 +381,7 @@ class AdminCommands(commands.Cog):
     ):
         """Add an answer with image option (Admin only)"""
         if not self.is_admin(interaction.user):
-            await interaction.response.send_message(
-                "❌ 이 명령어는 관리자만 사용할 수 있습니다.",
-                ephemeral=True
-            )
+            await self.send_no_permission_message(interaction)
             return
         
         try:
@@ -388,10 +457,7 @@ class AdminCommands(commands.Cog):
     async def show_stats(self, interaction: discord.Interaction):
         """Show question and answer statistics (Admin only)"""
         if not self.is_admin(interaction.user):
-            await interaction.response.send_message(
-                "❌ 이 명령어는 관리자만 사용할 수 있습니다.",
-                ephemeral=True
-            )
+            await self.send_no_permission_message(interaction)
             return
         
         try:
